@@ -2,6 +2,10 @@
 
 A RESTful API for a job board application, built with Node.js and Express. This API allows users to register, authenticate, and manage job postings. It integrates with AWS for storage and includes email notifications.
 
+Live/Base API:
+https://jobboardapi.tracebeta.com
+
+
 ## Features
 - User registration and authentication (JWT)
 - CRUD operations for job postings
@@ -96,3 +100,6 @@ Pull requests are welcome! For major changes, please open an issue first to disc
 
 ## License
 [MIT](LICENSE)
+
+
+

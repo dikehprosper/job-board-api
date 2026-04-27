@@ -18,7 +18,11 @@ app.use("/api/auth", authRoutes);
 
 // Root route
 app.get("/", (req, res) => {
-    res.send("API is running...");
+    res.json({
+        message: "Job Board API is running",
+        baseUrl: "https://jobboardapi.tracebeta.com",
+        status: "live"
+    });
 });
 
 // 404 handler
