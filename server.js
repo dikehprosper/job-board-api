@@ -8,6 +8,7 @@ require("dotenv").config();
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
@@ -20,19 +21,28 @@ app.get("/", (req, res) => {
     res.send("API is running...");
 });
 
-// ERROR HANDLER 
+// 404 handler
 app.use((req, res) => {
     res.status(404).json({
         success: false,
         message: "Route not found"
     });
 });
+
+// Error middleware
 app.use(errorHandler);
 
-// Connect DB + start server
+// DB + SERVER START
+const PORT = process.env.PORT || 5001;
+
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {
         console.log("MongoDB connected");
-        app.listen(5001, () => console.log("Server running on port 5001"));
+
+        app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+        console.error("MongoDB connection failed:", err);
+    });
