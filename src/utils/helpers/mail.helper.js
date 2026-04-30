@@ -1,14 +1,15 @@
-const ses = require("../config/aws.config");
+const ses = require("../../config/aws.config");
+require('dotenv').config(),
 
 module.exports = {
-    sendMailToUser,
+    sendMail
 }
 
-async function sendMailToUser(options) {
+async function sendMail(options) {
     const { recipientEmail, templateData } = options;
     const { resetUrl } = templateData;
-    console.log("TTTTTTTTTTTTTTTTTTTT", process.env.Domain_Frontend, resetUrl);
-        const htmlBody = `
+
+    const htmlBody = `
          <div style="font-family: Arial, sans-serif; max-width:600px; line-height:1.4; color:#111;">
             <p>We received a request to reset your password for your account.</p>
             <p>To complete the process, please click the link below to reset your password</p>
@@ -27,6 +28,6 @@ async function sendMailToUser(options) {
             Body: { Html: { Data: htmlBody, Charset: 'UTF-8' } }
         }
     };
-
+  
     return ses.sendEmail(params).promise();
 }

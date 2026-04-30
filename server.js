@@ -1,52 +1,53 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-const jobRoutes = require("./src/routes/jobRoutes");
-const authRoutes = require("./src/routes/authRoutes");
-const errorHandler = require("./src/middleware/errorMiddleware");
-require("dotenv").config();
+const passport = require('./src/config/passport.config.js');
+const logger = require("./src/config/logger.config.js");
+const pinoHttp = require('pino-http');
+const authRoutes = require("./src/routes/auth.route.js");
+const healthRoutes = require("./src/routes/health.route.js");
+const handlers = require('./src/utils/handlers.js');
+const connectMongo = require('./src/config/mongo.config.js');
+const { authenticateUser } = require("./src/middlewares/access.middleware.js");
 
 const app = express();
+app.use(pinoHttp({ logger }));
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 
-// Routes
-app.use("/api/jobs", jobRoutes);
+// Health Check
+app.use('/api/auth/health', healthRoutes);
+
+// Auth Routes
+app.use(passport.initialize());
 app.use("/api/auth", authRoutes);
 
-// Root route
-app.get("/", (req, res) => {
-    res.json({
-        message: "Job Board API is running",
-        baseUrl: "https://jobboardapi.tracebeta.com",
-        status: "live"
-    });
-});
+// Protected Routes (ENTER OTHER ROUTES HERE)
+app.use(authenticateUser);
+
+// Error Handler
+app.use(handlers.error);
 
 // 404 handler
 app.use((req, res) => {
-    res.status(404).json({
-        success: false,
-        message: "Route not found"
-    });
+    res.status(404).json({ status: "failed", message: "Method Not Allowed" });
 });
 
-// Error middleware
-app.use(errorHandler);
-
-// DB + SERVER START
 const PORT = process.env.PORT || 5001;
-
-mongoose.connect(process.env.MONGO_URI)
-    .then(() => {
-        console.log("MongoDB connected");
+const startServer = async () => {
+    try {
+        await connectMongo();
 
         app.listen(PORT, () => {
-            console.log(`Server running on port ${PORT}`);
+            console.log(`This app API is currently running on port ${PORT}`);
         });
-    })
-    .catch(err => {
-        console.error("MongoDB connection failed:", err);
-    });
+
+    } catch (err) {
+        console.error("Failed to start server:", err);
+        process.exit(1);
+    }
+};
+startServer();
+
+module.exports = app;
