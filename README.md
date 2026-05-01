@@ -1,45 +1,75 @@
-# Job Board API
 
-A RESTful API for a job board application, built with Node.js and Express. This API allows users to register, authenticate, and manage job postings. It integrates with AWS for storage and includes email notifications.
 
-Live/Base API:
-https://jobboardapi.tracebeta.com
+# CORE-API
 
+A fast starter kit for authentication and user management, built with Node.js, Express, and MongoDB. This API is designed for developers who want to quickly set up a secure backend without writing everything from scratch. Just clone, install, and add your own features!
 
 ## Features
-- User registration and authentication (JWT)
-- CRUD operations for job postings
-- Input validation
-- Error handling middleware
+- Fast setup for authentication and user management
+- User registration and authentication (JWT, Passport)
+- Rate limiting and security middleware (Helmet, HPP, CORS)
+- Centralized logging with Pino
+- MongoDB integration (Mongoose)
 - AWS integration for file storage
 - Email notifications
+- Modular structure for controllers, services, repositories, and middlewares
 
 ## Project Structure
 ```
-job-board-api/
+CORE-API/
 ├── package.json
 ├── server.js
 ├── src/
 │   ├── config/
-│   │   └── aws.config.js
+│   │   ├── aws.config.js
+│   │   ├── logger.config.js
+│   │   ├── mongo.config.js
+│   │   └── passport.config.js
 │   ├── controllers/
-│   │   └── authController.js
-│   ├── middleware/
+│   │   └── auth.controller.js
+│   ├── middlewares/
+│   │   ├── access.middleware.js
 │   │   ├── authMiddleware.js
-│   │   └── errorMiddleware.js
+│   │   ├── flags.middleware.js
+│   │   ├── rateLimit.middleware.js
+│   │   ├── validate.middleware.js
+│   │   └── verification.middleware.js
 │   ├── models/
-│   │   ├── Job.js
 │   │   └── User.js
+│   ├── repositories/
+│   │   ├── User.repository.js
+│   │   └── index.js
 │   ├── routes/
-│   │   ├── authRoutes.js
-│   │   └── jobRoutes.js
-│   ├── utils/
-│   │   ├── mail.js
-│   │   └── validateObjectId.js
-│   └── validation/
-│       ├── authValidation.js
-│       └── jobValidation.js
+│   │   ├── auth.route.js
+│   │   ├── health.route.js
+│   │   └── user.route.js
+│   ├── service/
+│   │   └── auth.service.js
+│   └── utils/
+│       ├── handlers.js
+│       └── helpers/
+│           ├── common.helper.js
+│           ├── generateAvatar.js
+│           ├── logs.helper.js
+│           ├── mail.helper.js
+│           ├── middlewares.helper.js
+│           ├── validators.helper.js
+│           └── variables.helper.js
 ```
+
+
+
+## How to Use
+
+1. **Clone the repo**
+2. **Install dependencies**
+3. **Add your .env file**
+4. **Run the server**
+5. **Start building your features!**
+
+This API is ready to go for most authentication and user management needs. You can easily add new routes, models, or connect to your frontend.
+
+---
 
 ## Getting Started
 
@@ -47,11 +77,12 @@ job-board-api/
 - Node.js (v16 or higher recommended)
 - npm or yarn
 
+
 ### Installation
 1. Clone the repository:
    ```bash
    git clone <repo-url>
-   cd job-board-api
+   cd CORE-API
    ```
 2. Install dependencies:
    ```bash
@@ -61,39 +92,55 @@ job-board-api/
    ```
 3. Create a `.env` file in the root directory and add the required environment variables (see below).
 
+
 ### Environment Variables
 Create a `.env` file in the root directory with the following variables:
 ```
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-AWS_ACCESS_KEY_ID=your_aws_access_key
-AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-AWS_REGION=your_aws_region
-EMAIL_USER=your_email_user
-EMAIL_PASS=your_email_password
+PORT=5001
+MONGO_URI=mongodb+srv://username:password@cluster0.mongodb.net/database_name
+ACCESS_TOKEN_PRIVATE_KEY=your_secret_key
+ACCESS_TOKEN_EXPIRATION=7d
+ACCESS_TOKEN_ALGORITHM=HS256
+FEATURE_CUSTOM_LOGIN=true
+FEATURE_CUSTOM_SIGNUP=true
+FEATURE_GOOGLE_AUTH=true
+FEATURE_GET_USER=true
+FEATURE_FORGOT_PASSWORD=true
+FEATURE_RESET_PASSWORD=true
+DOMAIN=http://localhost:5001
+FRONTEND_DOMAIN=http://localhost:3000
+AWS_ACCESS_KEY_ID=EXAMPLE_AWS_ACCESS_KEY
+AWS_SECRET_ACCESS_KEY=EXAMPLE_AWS_SECRET_KEY
+AWS_REGION=us-east-1
+SES_SENDER=example@yourdomain.com
+GOOGLE_CLIENT_ID=your-google-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
 
 **Note:** Never commit your `.env` file to version control.
+
 
 ### Running the Server
 ```bash
 npm start
 ```
-The server will start on the port specified in your `.env` file (default: 5000).
+The server will start on the port specified in your `.env` file (default: 5001).
 
-## API Endpoints
+
+
+## API Endpoints (Main Examples)
 
 ### Auth
 - `POST /api/auth/register` — Register a new user
 - `POST /api/auth/login` — Login and receive a JWT
+- `GET /api/auth/health` — Health check
 
-### Jobs
-- `GET /api/jobs` — Get all jobs
-- `POST /api/jobs` — Create a new job (authenticated)
-- `GET /api/jobs/:id` — Get a job by ID
-- `PUT /api/jobs/:id` — Update a job (authenticated)
-- `DELETE /api/jobs/:id` — Delete a job (authenticated)
+### Users
+- `GET /api/user` — Get user profile (authenticated)
+
+### Health
+- `GET /api/auth/health` — Health check endpoint
+
 
 ## Contributing
 Pull requests are welcome! For major changes, please open an issue first to discuss what you would like to change.
