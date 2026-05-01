@@ -133,6 +133,9 @@ The server will start on the port specified in your `.env` file (default: 5001).
 ### Auth
 - `POST /api/auth/register` — Register a new user
 - `POST /api/auth/login` — Login and receive a JWT
+- `POST /api/auth/google/callback` — Google OAuth login callback
+- `POST /api/auth/forgot-password` — Request password reset link
+- `POST /api/auth/reset/:token` — Reset password using token
 - `GET /api/auth/health` — Health check
 
 ### Users
