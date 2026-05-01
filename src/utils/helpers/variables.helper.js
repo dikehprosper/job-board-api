@@ -105,7 +105,9 @@ const userSchemaParentJoiObject = Joi.object({
     googleId: Joi.string(),
     input: Joi.string().min(1).max(200).required(),
     picture: Joi.string(),
-    token: Joi.string().min(10).required()
+    token: Joi.string().min(10).required(),
+    emailVerified: Joi.boolean(),
+    googleAuthcode: Joi.string().min(10).required()
 })
 
 module.exports = {

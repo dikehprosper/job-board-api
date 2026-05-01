@@ -8,12 +8,19 @@ const healthRoutes = require("./src/routes/health.route.js");
 const handlers = require('./src/utils/handlers.js');
 const connectMongo = require('./src/config/mongo.config.js');
 const { authenticateUser } = require("./src/middlewares/access.middleware.js");
+const { globalLimiter } = require("./middlewares/rateLimit.middleware");
+const helmet = require("helmet");
+const hpp = require("hpp");
 
 const app = express();
+app.set("trust proxy", 1);
+app.use(globalLimiter);
 app.use(pinoHttp({ logger }));
 
 // Middleware
 app.use(cors({ origin: "*" }));
+app.use(helmet());
+app.use(hpp());
 app.use(express.json());
 
 // Health Check

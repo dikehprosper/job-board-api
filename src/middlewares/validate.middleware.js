@@ -73,15 +73,15 @@ function validateSignUpData(req, res, next) {
 
 function validateGoogleLoginCallbackData(req, res, next) {
   try {
-    const { email, emailVerified, firstName, picture, googleId } = req.body
-    const userSchema = validatorHelper.createSchemaChildJoiObject(userSchemaParentJoiObject, ['email', 'emailVerified', 'firstName', 'picture', 'googleId'])
-    const { error: userValidationError, value: validatedUserData } = userSchema.validate({ email, emailVerified, firstName, picture, googleId })
+    const { googleAuthcode } = req.body
+    const userSchema = validatorHelper.createSchemaChildJoiObject(userSchemaParentJoiObject, [ 'googleAuthcode'])
+    const { error: userValidationError, value: validatedUserData } = userSchema.validate({ googleAuthcode })
 
     if (userValidationError) {
       sendLogs(req.log, 'info', { message: 'Google Auth Validation Error', fnc: 'validateGoogleLoginCallbackData', info: { error: userValidationError }})
       return res.status(httpStatus.BAD_REQUEST.code).end()
     }
-    req.body = { email: validatedUserData.email, firstName: validatedUserData.firstName, picture: validatedUserData.picture, googleId: validatedUserData.googleId, emailVerified: validatedUserData.emailVerified }
+    req.body = { googleAuthcode: validatedUserData.googleAuthcode }
 
     next()
   } catch (error) {

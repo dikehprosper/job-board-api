@@ -50,8 +50,8 @@ async function generateAndSetUserTokens(payload) {
   return accessToken
 }
 
-async function updateUser(user, updates) {
-  return UserRepo.update(user, updates)
+async function updateUser(userId, updates) {
+  return UserRepo.updateById(userId, updates);
 }
 
 async function createUser(userDetails) {

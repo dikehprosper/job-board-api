@@ -57,8 +57,10 @@ const {
  * ----------------------------
  * Ensures user exists/valid before sensitive operations like password reset.
  */
-const { verifyUserWithEmail } = require("../middlewares/verification.middleware");
+const { verifyUserWithEmail, verifyGoogleAuthCode } = require("../middlewares/verification.middleware");
 
+// Rate limiting middleware for auth routes (prevents abuse like brute-force login and password reset spam)
+const { authSlowDown, authLimiter, forgotPasswordLimiter } = require("../middlewares/rateLimit.middleware");
 
 /**
  * AUTH ROUTES
@@ -72,7 +74,7 @@ const { verifyUserWithEmail } = require("../middlewares/verification.middleware"
  * - validates login input
  * - executes login controller
  */
-router.post('/login', routesWrapper([loginFlag, validateLoginData, customLogin]));
+router.post('/login', routesWrapper([authSlowDown, authLimiter, loginFlag, validateLoginData, customLogin]));
 
 /**
  * Register route
@@ -80,7 +82,7 @@ router.post('/login', routesWrapper([loginFlag, validateLoginData, customLogin])
  * - validates signup payload
  * - creates new user account
  */
-router.post('/register', routesWrapper([signUpFlag, validateSignUpData, customSignUp]));
+router.post('/register', routesWrapper([authSlowDown, authLimiter, signUpFlag, validateSignUpData, customSignUp]));
 
 /**
  * Google OAuth callback
@@ -90,6 +92,7 @@ router.post('/register', routesWrapper([signUpFlag, validateSignUpData, customSi
 router.post('/google/callback', routesWrapper([
     googleAuthFlag,
     validateGoogleLoginCallbackData,
+    verifyGoogleAuthCode,
     googleLoginCallback
 ]));
 
@@ -100,6 +103,7 @@ router.post('/google/callback', routesWrapper([
  * - sends password reset link
  */
 router.post('/forgot-password', routesWrapper([
+    forgotPasswordLimiter,
     forgotPasswordFlag,
     validateEmailSyntax,
     verifyUserWithEmail,

@@ -2,7 +2,7 @@ const User  = require('../models/User')
 
 module.exports = {
   create,
-  update,
+  updateById,
   findOne,
   find
 }
@@ -15,10 +15,13 @@ async function find(options) {
   return User.findOne(options)
 }
 
-async function update(user, updates) {
-  return user.update(updates);
+async function updateById(userId, updates) {
+  return User.findByIdAndUpdate(
+    userId,
+    { $set: updates },
+    { new: true } 
+  );
 }
-
 async function create(options) {
   return User.create(options)
 }
