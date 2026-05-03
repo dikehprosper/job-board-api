@@ -1,14 +1,33 @@
 const ses = require("../../config/aws.config");
 require('dotenv').config(),
 
+/**
+ * Exported mail utility
+ */
 module.exports = {
     sendMail
 }
 
+/**
+ * Sends an email using AWS SES
+ * 
+ * Currently used for password reset emails
+ * 
+ * @param {Object} options - Mail configuration object
+ * @param {String} options.recipientEmail - Recipient's email address
+ * @param {Object} options.templateData - Data used to populate the email template
+ * @param {String} options.templateData.resetUrl - Password reset link
+ * 
+ * @returns {Promise<Object>} - AWS SES sendEmail response
+ */
 async function sendMail(options) {
     const { recipientEmail, templateData } = options;
     const { resetUrl } = templateData;
 
+    /**
+     * HTML email body for password reset
+     * Includes a call-to-action button with reset link
+     */
     const htmlBody = `
          <div style="font-family: Arial, sans-serif; max-width:600px; line-height:1.4; color:#111;">
             <p>We received a request to reset your password for your account.</p>
@@ -20,14 +39,21 @@ async function sendMail(options) {
         </div>
     `;
 
+    /**
+     * AWS SES email parameters
+     */
     const params = {
-        Source: process.env.SES_SENDER,
-        Destination: { ToAddresses: [recipientEmail] },
+        Source: process.env.SES_SENDER, // Verified SES sender email
+        Destination: { ToAddresses: [recipientEmail] }, // Recipient email
         Message: {
             Subject: { Data: `Password Reset Request`, Charset: 'UTF-8' },
             Body: { Html: { Data: htmlBody, Charset: 'UTF-8' } }
         }
     };
   
+    /**
+     * Send email via AWS SES
+     * .promise() converts callback-based API to Promise
+     */
     return ses.sendEmail(params).promise();
 }

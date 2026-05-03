@@ -4,11 +4,12 @@ const passport = require('./src/config/passport.config.js');
 const logger = require("./src/config/logger.config.js");
 const pinoHttp = require('pino-http');
 const authRoutes = require("./src/routes/auth.route.js");
+const userRoutes = require("./src/routes/user.route.js");
 const healthRoutes = require("./src/routes/health.route.js");
 const handlers = require('./src/utils/handlers.js');
 const connectMongo = require('./src/config/mongo.config.js');
 const { authenticateUser } = require("./src/middlewares/access.middleware.js");
-const { globalLimiter } = require("./middlewares/rateLimit.middleware");
+const { globalLimiter } = require("./src/middlewares/rateLimit.middleware");
 const helmet = require("helmet");
 const hpp = require("hpp");
 
@@ -32,6 +33,7 @@ app.use("/api/auth", authRoutes);
 
 // Protected Routes (ENTER OTHER ROUTES HERE)
 app.use(authenticateUser);
+app.use("/api/users", userRoutes);
 
 // Error Handler
 app.use(handlers.error);

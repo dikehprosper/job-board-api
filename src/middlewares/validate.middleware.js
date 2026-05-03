@@ -5,6 +5,9 @@ const { sendLogs } = require('../utils/helpers/logs.helper.js')
 
 require('dotenv').config()
 
+/**
+ * Exported validation middlewares
+ */
 module.exports = {
   validateLoginData,
   validateSignUpData,
@@ -15,18 +18,31 @@ module.exports = {
   validateTokenSyntax
 }
 
-
+/**
+ * Validates login payload (email + password)
+ */
 function validateLoginData (req, res, next) {
   try {
     const { email, password } = req.body
-    const userSchema = validatorHelper.createSchemaChildJoiObject(userSchemaParentJoiObject, ['password', 'email'])
-    const { error: userValidationError, value: validatedUserData } = userSchema.validate({ email, password })
+
+    const userSchema = validatorHelper.createSchemaChildJoiObject(
+      userSchemaParentJoiObject,
+      ['password', 'email']
+    )
+
+    const { error: userValidationError, value: validatedUserData } =
+      userSchema.validate({ email, password })
 
     if (userValidationError) {
-      sendLogs(req.log, 'info', { message: 'Login Validation Error', fnc: 'validateLoginData', info: { error: userValidationError } })
+      sendLogs(req.log, 'info', {
+        message: 'Login Validation Error',
+        fnc: 'validateLoginData',
+        info: { error: userValidationError }
+      })
       return res.status(httpStatus.BAD_REQUEST.code).end()
     }
 
+    // Assign sanitized values
     req.body.email = validatedUserData.email
     req.body.password = validatedUserData.password
 
@@ -34,23 +50,33 @@ function validateLoginData (req, res, next) {
   } catch (error) {
     handleError({
       loggerInstance: req.log,
-      info: {
-        fnc: 'validateLoginData',
-        error
-      }
+      info: { fnc: 'validateLoginData', error }
     })
     res.status(httpStatus.SERVER_ERROR.code).end()
   }
 }
 
+/**
+ * Validates signup payload (email + password + name)
+ */
 function validateSignUpData(req, res, next) {
   try {
     const { email, password, name } = req.body
-    const userSchema = validatorHelper.createSchemaChildJoiObject(userSchemaParentJoiObject, ['password', 'email', 'name'])
-    const { error: userValidationError, value: validatedUserData } = userSchema.validate({ email, password, name })
+
+    const userSchema = validatorHelper.createSchemaChildJoiObject(
+      userSchemaParentJoiObject,
+      ['password', 'email', 'name']
+    )
+
+    const { error: userValidationError, value: validatedUserData } =
+      userSchema.validate({ email, password, name })
 
     if (userValidationError) {
-      sendLogs(req.log, 'info', { message: 'Signup Validation Error', fnc: 'validateSignUpData', info: { error: userValidationError } })
+      sendLogs(req.log, 'info', {
+        message: 'Signup Validation Error',
+        fnc: 'validateSignUpData',
+        info: { error: userValidationError }
+      })
       return res.status(httpStatus.BAD_REQUEST.code).end()
     }
 
@@ -62,49 +88,70 @@ function validateSignUpData(req, res, next) {
   } catch (error) {
     handleError({
       loggerInstance: req.log,
-      info: {
-        fnc: 'validateSignUpData',
-        error
-      }
+      info: { fnc: 'validateSignUpData', error }
     })
     res.status(httpStatus.SERVER_ERROR.code).end()
   }
 }
 
+/**
+ * Validates Google OAuth callback payload (auth code)
+ */
 function validateGoogleLoginCallbackData(req, res, next) {
   try {
     const { googleAuthcode } = req.body
-    const userSchema = validatorHelper.createSchemaChildJoiObject(userSchemaParentJoiObject, [ 'googleAuthcode'])
-    const { error: userValidationError, value: validatedUserData } = userSchema.validate({ googleAuthcode })
+
+    const userSchema = validatorHelper.createSchemaChildJoiObject(
+      userSchemaParentJoiObject,
+      ['googleAuthcode']
+    )
+
+    const { error: userValidationError, value: validatedUserData } =
+      userSchema.validate({ googleAuthcode })
 
     if (userValidationError) {
-      sendLogs(req.log, 'info', { message: 'Google Auth Validation Error', fnc: 'validateGoogleLoginCallbackData', info: { error: userValidationError }})
+      sendLogs(req.log, 'info', {
+        message: 'Google Auth Validation Error',
+        fnc: 'validateGoogleLoginCallbackData',
+        info: { error: userValidationError }
+      })
       return res.status(httpStatus.BAD_REQUEST.code).end()
     }
+
+    // Replace body with validated payload
     req.body = { googleAuthcode: validatedUserData.googleAuthcode }
 
     next()
   } catch (error) {
     handleError({
       loggerInstance: req.log,
-      info: {
-        fnc: 'validateGoogleLoginCallbackData',
-        error
-      }
+      info: { fnc: 'validateGoogleLoginCallbackData', error }
     })
     res.status(httpStatus.SERVER_ERROR.code).end()
   }
 }
 
+/**
+ * Validates email syntax only
+ */
 function validateEmailSyntax(req, res, next) {
-
   try {
     const { email } = req.body
-    const userSchema = validatorHelper.createSchemaChildJoiObject(userSchemaParentJoiObject, ['email'])
-    const { error: userValidationError, value: validatedUserData } = userSchema.validate({ email })
+
+    const userSchema = validatorHelper.createSchemaChildJoiObject(
+      userSchemaParentJoiObject,
+      ['email']
+    )
+
+    const { error: userValidationError, value: validatedUserData } =
+      userSchema.validate({ email })
 
     if (userValidationError) {
-      sendLogs(req.log, 'info', { message: 'Email Validation Error', fnc: 'validateEmailSyntax', info: { error: userValidationError } })
+      sendLogs(req.log, 'info', {
+        message: 'Email Validation Error',
+        fnc: 'validateEmailSyntax',
+        info: { error: userValidationError }
+      })
       return res.status(httpStatus.BAD_REQUEST.code).end()
     }
 
@@ -114,24 +161,33 @@ function validateEmailSyntax(req, res, next) {
   } catch (error) {
     handleError({
       loggerInstance: req.log,
-      info: {
-        fnc: 'validateEmailSyntax',
-        error
-      }
+      info: { fnc: 'validateEmailSyntax', error }
     })
     res.status(httpStatus.SERVER_ERROR.code).end()
   }
 }
 
+/**
+ * Validates password syntax only
+ */
 function validatePasswordSyntax(req, res, next) {
-  
   try {
     const { password } = req.body
-    const userSchema = validatorHelper.createSchemaChildJoiObject(userSchemaParentJoiObject, ['password'])
-    const { error: userValidationError, value: validatedUserData } = userSchema.validate({ password })
+
+    const userSchema = validatorHelper.createSchemaChildJoiObject(
+      userSchemaParentJoiObject,
+      ['password']
+    )
+
+    const { error: userValidationError, value: validatedUserData } =
+      userSchema.validate({ password })
 
     if (userValidationError) {
-      sendLogs(req.log, 'info', { message: 'Password Validation Error', fnc: 'validatePasswordSyntax', info: { error: userValidationError } })
+      sendLogs(req.log, 'info', {
+        message: 'Password Validation Error',
+        fnc: 'validatePasswordSyntax',
+        info: { error: userValidationError }
+      })
       return res.status(httpStatus.BAD_REQUEST.code).end()
     }
 
@@ -141,21 +197,24 @@ function validatePasswordSyntax(req, res, next) {
   } catch (error) {
     handleError({
       loggerInstance: req.log,
-      info: {
-        fnc: 'validatePasswordSyntax',
-        error
-      }
+      info: { fnc: 'validatePasswordSyntax', error }
     })
     res.status(httpStatus.SERVER_ERROR.code).end()
   }
 }
 
+/**
+ * Ensures password and confirmPassword match
+ */
 function validateIfPasswordMatches(req, res, next) {
   try {
     const { password, confirmPassword } = req.body
 
     if (password !== confirmPassword) {
-      sendLogs(req.log, 'info', { message: 'Passwords do not match', fnc: 'validateIfPasswordMatches' })
+      sendLogs(req.log, 'info', {
+        message: 'Passwords do not match',
+        fnc: 'validateIfPasswordMatches'
+      })
       return res.status(httpStatus.BAD_REQUEST.code).end()
     }
 
@@ -163,40 +222,44 @@ function validateIfPasswordMatches(req, res, next) {
   } catch (error) {
     handleError({
       loggerInstance: req.log,
-      info: {
-        fnc: 'validateIfPasswordMatches',
-        error
-      }
+      info: { fnc: 'validateIfPasswordMatches', error }
     })
     res.status(httpStatus.SERVER_ERROR.code).end()
   }
 }
 
+/**
+ * Validates token syntax from route params
+ */
 function validateTokenSyntax(req, res, next) {
   try {
     const { token } = req.params
-    const userSchema = validatorHelper.createSchemaChildJoiObject(userSchemaParentJoiObject, ['token'])
-    const { error: userValidationError, value: validatedUserData } = userSchema.validate({ token })
+
+    const userSchema = validatorHelper.createSchemaChildJoiObject(
+      userSchemaParentJoiObject,
+      ['token']
+    )
+
+    const { error: userValidationError, value: validatedUserData } =
+      userSchema.validate({ token })
 
     if (userValidationError) {
-      sendLogs(req.log, 'info', { message: 'Token Validation Error', fnc: 'validateTokenSyntax', info: { error: userValidationError } })
+      sendLogs(req.log, 'info', {
+        message: 'Token Validation Error',
+        fnc: 'validateTokenSyntax',
+        info: { error: userValidationError }
+      })
       return res.status(httpStatus.BAD_REQUEST.code).end()
     }
 
-    req.params.token = validatedUserData.token;
+    req.params.token = validatedUserData.token
 
     next()
   } catch (error) {
     handleError({
       loggerInstance: req.log,
-      info: {
-        fnc: 'validateTokenSyntax',
-        error
-      }
+      info: { fnc: 'validateTokenSyntax', error }
     })
     res.status(httpStatus.SERVER_ERROR.code).end()
   }
 }
-
-
-

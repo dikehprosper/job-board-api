@@ -61,6 +61,7 @@ async function customLogin(req, res) {
             success: true,
             accessToken,
         });
+    
     } catch (info) {
         /**
          * Normalize error message from service layer

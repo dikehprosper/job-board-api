@@ -90,6 +90,8 @@ router.post('/register', routesWrapper([authSlowDown, authLimiter, signUpFlag, v
  * - handles social login/signup
  */
 router.post('/google/callback', routesWrapper([
+    authSlowDown,
+    authLimiter,
     googleAuthFlag,
     validateGoogleLoginCallbackData,
     verifyGoogleAuthCode,
@@ -118,6 +120,8 @@ router.post('/forgot-password', routesWrapper([
  * - updates user password
  */
 router.post('/reset/:token', routesWrapper([
+    authSlowDown,
+    authLimiter,
     resetPasswordFlag,
     validateIfPasswordMatches,
     validatePasswordSyntax,
